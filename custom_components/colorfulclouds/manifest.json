@@ -1,8 +1,9 @@
 {
   "domain": "colorfulclouds",
-  "name": "colorfulclouds",
+  "name": "Colorfulclouds",
+  "issue_tracker": "https://github.com/fineemb/Colorfulclouds-weather/issues",
   "documentation": "https://github.com/jihao/colorfulclouds-hass",
   "dependencies": [],
-  "codeowners": ["@jihao"],
+  "codeowners": ["@fineemb"],
   "requirements": []
 }
