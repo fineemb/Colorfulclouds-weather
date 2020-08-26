@@ -1,0 +1,8 @@
+{
+  "domain": "colorfulclouds",
+  "name": "colorfulclouds",
+  "documentation": "https://github.com/jihao/colorfulclouds-hass",
+  "dependencies": [],
+  "codeowners": ["@jihao"],
+  "requirements": []
+}
