@@ -1,0 +1,36 @@
+{
+    "config": {
+        "title": "彩云天气",
+        "step": {
+            "user": {
+                "title": "彩云天气",
+                "description": "如果您需要配置方面的帮助，请查看此处: https://github.com/fineemb/Colorfulclouds-weather",
+                "data": {
+                    "api_key": "彩云API Key",
+                    "api_version": "API版本,默认是v2.5",
+                    "latitude" : "维度",
+                    "longitude" : "经度",
+                    "name" : "名称"
+                }
+            }
+        },
+        "error": {
+            "communication": "Key可能无效，请检查输入值."
+        },
+        "abort": {
+            "single_instance_allowed": "仅允许单个配置.",
+            "already_configured": "请勿重复配置."
+        }
+    },
+    "options": {
+        "step": {
+            "user":{
+                "data": {
+                    "forecast": "预报天数 (0为不获取)",
+                    "alert": "极端天气预警"
+                },
+                "description": "设置你需要获取预报数据的天数,以及极端天气预警数据"
+            }
+        }
+    }
+}

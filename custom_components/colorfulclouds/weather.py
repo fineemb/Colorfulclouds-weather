@@ -1,27 +1,35 @@
-'''
-@Author        : fineemb
-@Github        : https://github.com/fineemb
-@Description   : 
-@Date          : 2019-09-08 21:34:57
-LastEditors   : fineemb
-LastEditTime  : 2020-08-26 16:28:56
-'''
+
+
+import logging
+import json
 from datetime import datetime, timedelta
 
 from homeassistant.components.weather import (
-    WeatherEntity, ATTR_FORECAST_CONDITION, ATTR_FORECAST_PRECIPITATION,
-    ATTR_FORECAST_TEMP, ATTR_FORECAST_TEMP_LOW, ATTR_FORECAST_TIME, ATTR_FORECAST_WIND_BEARING, ATTR_FORECAST_WIND_SPEED)
-from homeassistant.const import (TEMP_CELSIUS, TEMP_FAHRENHEIT, CONF_API_KEY, CONF_API_VERSION, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME)
+    WeatherEntity, 
+    ATTR_FORECAST_CONDITION, 
+    ATTR_FORECAST_PRECIPITATION,
+    ATTR_FORECAST_TEMP, 
+    ATTR_FORECAST_TEMP_LOW, 
+    ATTR_FORECAST_TIME, 
+    ATTR_FORECAST_WIND_BEARING, 
+    ATTR_FORECAST_WIND_SPEED
+)
+from homeassistant.const import (
+    TEMP_CELSIUS, 
+    TEMP_FAHRENHEIT, 
+    CONF_NAME
+)
+from .const import (
+    ATTR_FORECAST,
+    ATTRIBUTION,
+    COORDINATOR,
+    DOMAIN,
+    NAME,
+    MANUFACTURER
+)
 
-import requests
-import json
-
-VERSION = '0.1.3'
-DOMAIN = 'colorfulclouds'
-
-# mapping, why? because 
-# https://github.com/home-assistant/home-assistant-polymer/blob/master/src/cards/ha-weather-card.js#L279
-# https://open.caiyunapp.com/%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94_API/v2.5
+PARALLEL_UPDATES = 1
+_LOGGER = logging.getLogger(__name__)
 
 CONDITION_MAP = {
     'CLEAR_DAY': 'sunny',
@@ -52,121 +60,146 @@ CONDITION_MAP = {
     'SNOW': 'snowy'
 }
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    add_entities([ColorfulCloudsWeather(api_key=config.get(CONF_API_KEY),
-                                        api_version=config.get(CONF_API_VERSION, 'v2.5'),
-                                        lng=config.get(CONF_LONGITUDE, hass.config.longitude),
-                                        lat=config.get(CONF_LATITUDE, hass.config.latitude),
-                                        name=config.get(CONF_NAME, 'colorfulclouds'))])
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Add a Colorfulclouds weather entity from a config_entry."""
+    name = config_entry.data[CONF_NAME]
 
+    coordinator = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
+    _LOGGER.debug("Requests remaining: %s", coordinator.data["is_metric"])
 
-class ColorfulCloudsWeather(WeatherEntity):
+    async_add_entities([ColorfulCloudsEntity(name, coordinator)], False)
+            
+class ColorfulCloudsEntity(WeatherEntity):
     """Representation of a weather condition."""
 
-    def __init__(self, api_key: str, api_version: str, lng: str, lat: str, name: str):
-        self._api_key = api_key
-        self._api_version = api_version
-        self._lng = lng
-        self._lat = lat
+    def __init__(self, name, coordinator):
+        
+        self.coordinator = coordinator
+        self._forecast_data = self.coordinator.data[ATTR_FORECAST]
         self._name = name
-
-        self.update()
+        self._attrs = {}
+        self._unit_system = "Metric" if self.coordinator.data["is_metric"]=="metric:v2" else "Imperial"
 
     @property
     def name(self):
         return self._name
+        
+    @property
+    def attribution(self):
+        """Return the attribution."""
+        return ATTRIBUTION
+        
+    @property
+    def unique_id(self):
+        """Return a unique_id for this entity."""
+        _LOGGER.debug("weather_unique_id: %s", self.coordinator.data["location_key"])
+        return self.coordinator.data["location_key"]
 
     @property
-    def state(self):
+    def device_info(self):
+        """Return the device info."""
+        return {
+            "identifiers": {(DOMAIN, self.coordinator.data["location_key"])},
+            "name": self._name,
+            "manufacturer": MANUFACTURER,
+            "entry_type": "service",
+        }
+    @property
+    def should_poll(self):
+        """Return the polling requirement of the entity."""
+        return False
+
+    @property
+    def available(self):
+        """Return True if entity is available."""
+        return self.coordinator.last_update_success
+        
+    @property
+    def condition(self):
         """Return the weather condition."""
-        skycon = self._realtime_data['result']['realtime']['skycon']
+        skycon = self.coordinator.data["result"]["realtime"]["skycon"]
         return CONDITION_MAP[skycon]
 
     @property
     def temperature(self):
-        return self._realtime_data['result']['realtime']['temperature']
+        return self.coordinator.data["result"]['realtime']['temperature']
 
     @property
     def temperature_unit(self):
-        return TEMP_CELSIUS
+        return TEMP_CELSIUS if self.coordinator.data["is_metric"]=="metric:v2" else TEMP_FAHRENHEIT
 
     @property
     def humidity(self):
-        return float(self._realtime_data['result']['realtime']['humidity']) * 100
+        return float(self.coordinator.data["result"]['realtime']['humidity']) * 100
 
     @property
     def wind_speed(self):
         """风速"""
-        return self._realtime_data['result']['realtime']['wind']['speed']
+        return self.coordinator.data["result"]['realtime']['wind']['speed']
 
     @property
     def wind_bearing(self):
         """风向"""
-        return self._realtime_data['result']['realtime']['wind']['direction']
+        return self.coordinator.data["result"]['realtime']['wind']['direction']
 
     @property
     def visibility(self):
         """能见度"""
-        return self._realtime_data['result']['realtime']['visibility']
+        return self.coordinator.data["result"]['realtime']['visibility']
 
     @property
     def pressure(self):
-        return self._realtime_data['result']['realtime']['pressure']
-
-    @property
-    def attribution(self):
-        """Return the attribution."""
-        return 'Powered by ColorfulClouds and China Meteorological Administration'
+        return self.coordinator.data["result"]['realtime']['pressure']
 
     @property
     def pm25(self):
         """pm25，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['pm25']
+        return self.coordinator.data["result"]['realtime']['air_quality']['pm25']
 
     @property
     def pm10(self):
         """pm10，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['pm10']
+        return self.coordinator.data["result"]['realtime']['air_quality']['pm10']
 
     @property
     def o3(self):
         """臭氧，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['o3']
+        return self.coordinator.data["result"]['realtime']['air_quality']['o3']
 
     @property
     def no2(self):
         """二氧化氮，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['no2']
+        return self.coordinator.data["result"]['realtime']['air_quality']['no2']
 
     @property
     def so2(self):
         """二氧化硫，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['so2']
+        return self.coordinator.data["result"]['realtime']['air_quality']['so2']
 
     @property
     def co(self):
         """一氧化碳，质量浓度值"""
-        return self._realtime_data['result']['realtime']['air_quality']['co']
+        return self.coordinator.data["result"]['realtime']['air_quality']['co']
 
     @property
     def aqi(self):
         """AQI（国标）"""
-        return self._realtime_data['result']['realtime']['air_quality']['aqi']['chn']
+        return self.coordinator.data["result"]['realtime']['air_quality']['aqi']['chn']
 
     @property
     def aqi_description(self):
         """AQI（国标）"""
-        return self._realtime_data['result']['realtime']['air_quality']['description']['chn']
+        return self.coordinator.data["result"]['realtime']['air_quality']['description']['chn']
 
     @property
     def aqi_usa(self):
         """AQI USA"""
-        return self._realtime_data['result']['realtime']['air_quality']['aqi']['usa']
+        return self.coordinator.data["result"]['realtime']['air_quality']['aqi']['usa']
     
     @property
     def aqi_usa_description(self):
         """AQI USA"""
-        return self._realtime_data['result']['realtime']['air_quality']['description']['usa']
+        return self.coordinator.data["result"]['realtime']['air_quality']['description']['usa']
     
     @property
     def forecast_hourly(self):
@@ -198,13 +231,12 @@ class ColorfulCloudsWeather(WeatherEntity):
 
     @property
     def state_attributes(self):
-        data = super(ColorfulCloudsWeather, self).state_attributes
+        data = super(ColorfulCloudsEntity, self).state_attributes
         data['forecast_hourly'] = self.forecast_hourly
         data['forecast_minutely'] = self.forecast_minutely
         data['forecast_probability'] = self.forecast_minutely_probability
         data['forecast_keypoint'] = self.forecast_keypoint
         data['forecast_alert'] = self.forecast_alert
-        data['skycon'] = self._realtime_data['result']['realtime']['skycon']
         data['pm25'] = self.pm25
         data['pm10'] = self.pm10
         data['o3'] = self.o3
@@ -246,9 +278,12 @@ class ColorfulCloudsWeather(WeatherEntity):
 
         return forecast_data
 
-    def update(self):
-        json_text = requests.get(str.format("https://api.caiyunapp.com/{}/{}/{},{}/realtime.json?unit=metric:v2", self._api_version, self._api_key, self._lng, self._lat)).content
-        self._realtime_data = json.loads(json_text)
+    async def async_added_to_hass(self):
+        """Connect to dispatcher listening for entity data notifications."""
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self.async_write_ha_state)
+        )
 
-        json_text = requests.get(str.format("https://api.caiyunapp.com/{}/{}/{},{}/forecast.json?unit=metric:v2&dailysteps=15&alert=true", self._api_version, self._api_key, self._lng, self._lat)).content
-        self._forecast_data = json.loads(json_text)
+    async def async_update(self):
+        """Update Colorfulclouds entity."""
+        await self.coordinator.async_request_refresh()

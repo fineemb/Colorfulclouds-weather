@@ -1,6 +1,6 @@
 {
     "name": "彩云天气",
-    "domains": ["weather"],
+    "domains": ["weather","sensor"],
     "render_readme": true,
     "homeassistant": "0.99.9",
     "country": ["CN"]

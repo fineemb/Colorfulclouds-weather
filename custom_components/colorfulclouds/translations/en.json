@@ -1,0 +1,36 @@
+{
+    "config": {
+        "title": "Colorfulclouds Weather",
+        "step": {
+            "user": {
+                "title": "Colorfulclouds Weather",
+                "description": "If you need help with the configuration have a look here: https://github.com/fineemb/Colorfulclouds-weather",
+                "data": {
+                    "api_key": "API Key",
+                    "api_version": "API version, default: v2.5",
+                    "latitude" : "Latitude",
+                    "longitude" : "Longitude",
+                    "name" : "Name"
+                }
+            }
+        },
+        "error": {
+            "communication": "Key may be invalid, please check the input value."
+        },
+        "abort": {
+            "single_instance_allowed": "Only a single configuration of Colorfulclouds Weather is allowed.",
+            "already_configured": "This is already configured."
+        }
+    },
+    "options": {
+        "step": {
+            "user":{
+                "data": {
+                    "forecast": "Forecast days",
+                    "alert": "Extreme weather warning"
+                },
+                "description": "Set the number of days you need to obtain forecast data, 0 means no"
+            }
+        }
+    }
+}
