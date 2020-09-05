@@ -4,7 +4,7 @@
  * @Description   : 
  * @Date          : 2020-08-26 16:20:12
  * @LastEditors   : fineemb
- * @LastEditTime  : 2020-08-30 22:17:49
+ * @LastEditTime  : 2020-09-05 22:26:26
 -->
 
 # 彩云天气
@@ -17,18 +17,17 @@
 
 在这个基础上,返回了彩云能够提供的所有数据.
 
+配合此集成的[前端卡片](https://github.com/fineemb/lovelace-colorfulclouds-weather-card)
+
 ## 更新
 
-+ v1.1
++ ### v1.1
   + 支持前端UI配置
++ ### v1.2
+  + 支持多个地点(设备)
+  + 支持历史信息(比如昨天或前天天气情况)
+  + 支持自定义天级预报和小时级预报的数量
   
 ## 安装配置
 
-```yaml
-weather: 
-  - platform: colorfulclouds
-    api_key: !secret colorfulclouds_key  
-    latitude: 31.55
-    longitude: 121.09
-
-```
+建议使用HACS安装和配置

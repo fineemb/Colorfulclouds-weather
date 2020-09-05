@@ -26,8 +26,10 @@
         "step": {
             "user":{
                 "data": {
-                    "forecast": "Forecast days",
-                    "alert": "Extreme weather warning"
+                    "dailysteps": "Forecast days (5-15)",
+                    "hourlysteps": "Forecast hours (24-360)",
+                    "alert": "Extreme weather warning",
+                    "starttime": "Start time (-2 ~ 0)"
                 },
                 "description": "Set the number of days you need to obtain forecast data, 0 means no"
             }

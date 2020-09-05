@@ -2,6 +2,7 @@
   "domain": "colorfulclouds",
   "name": "colorfulclouds",
   "documentation": "https://github.com/fineemb/Colorfulclouds-weather",
+  "issue_tracker": "https://github.com/fineemb/Colorfulclouds-weather/issues",
   "dependencies": [],
   "config_flow": true,
   "codeowners": ["@fineemb"],

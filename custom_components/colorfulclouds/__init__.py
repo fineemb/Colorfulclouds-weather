@@ -4,7 +4,7 @@ Github        : https://github.com/fineemb
 Description   : 
 Date          : 2020-06-07 16:40:38
 LastEditors   : fineemb
-LastEditTime  : 2020-08-30 20:56:04
+LastEditTime  : 2020-09-03 12:51:56
 '''
 """
 Component to integrate with 彩云天气.
@@ -15,7 +15,7 @@ https://github.com/fineemb/Colorfulclouds-weather
 import asyncio
 import requests
 import json
-from datetime import timedelta
+import datetime
 import logging
 
 from aiohttp.client_exceptions import ClientConnectorError
@@ -29,10 +29,13 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .const import (
     ATTR_FORECAST,
-    CONF_FORECAST,
+    CONF_DAILYSTEPS,
+    CONF_HOURLYSTEPS,
+    CONF_ALERT,
     CONF_API_VERSION,
     CONF_LONGITUDE,
     CONF_LATITUDE,
+    CONF_STARTTIME,
     COORDINATOR,
     DOMAIN,
     UNDO_UPDATE_LISTENER,
@@ -54,14 +57,17 @@ async def async_setup_entry(hass, config_entry) -> bool:
     longitude = config_entry.data[CONF_LONGITUDE]
     latitude = config_entry.data[CONF_LATITUDE]
     api_version = config_entry.data[CONF_API_VERSION]
-    forecast = config_entry.options.get(CONF_FORECAST, 15)
+    dailysteps = config_entry.options.get(CONF_DAILYSTEPS, 5)
+    hourlysteps = config_entry.options.get(CONF_HOURLYSTEPS, 24)
+    alert = config_entry.options.get(CONF_ALERT, True)
+    starttime = config_entry.options.get(CONF_STARTTIME, 0)
 
-    _LOGGER.debug("Using location_key: %s, get forecast: %s", location_key, forecast)
+    _LOGGER.debug("Using location_key: %s, get forecast: %s", location_key, api_version)
 
     websession = async_get_clientsession(hass)
 
     coordinator = ColorfulcloudsDataUpdateCoordinator(
-        hass, websession, api_key, api_version, location_key, longitude, latitude, forecast
+        hass, websession, api_key, api_version, location_key, longitude, latitude, dailysteps, hourlysteps, alert, starttime
     )
     await coordinator.async_refresh()
 
@@ -109,14 +115,17 @@ async def update_listener(hass, config_entry):
 class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Colorfulclouds data API."""
 
-    def __init__(self, hass, session, api_key, api_version, location_key, longitude, latitude, forecast: int):
+    def __init__(self, hass, session, api_key, api_version, location_key, longitude, latitude, dailysteps: int, hourlysteps: int, alert: bool, starttime: int):
         """Initialize."""
         self.location_key = location_key
         self.longitude = longitude
         self.latitude = latitude
-        self.forecast = forecast
+        self.dailysteps = dailysteps
+        self.alert = alert
+        self.hourlysteps = hourlysteps
         self.api_version = api_version
         self.api_key = api_key
+        self.start_timestamp = int((datetime.datetime.now()+datetime.timedelta(days=starttime)).timestamp())
         self.is_metric = hass.config.units.is_metric
         if hass.config.units.is_metric:
             self.is_metric = "metric:v2"
@@ -124,7 +133,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
             self.is_metric = "imperial"
 
         update_interval = (
-            timedelta(minutes=2) if self.forecast else timedelta(minutes=1)
+            datetime.timedelta(minutes=4)
         )
         _LOGGER.debug("Data will be update every %s", update_interval)
 
@@ -134,23 +143,14 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
         try:
             async with timeout(10):
-
-                json_text = requests.get(str.format("https://api.caiyunapp.com/{}/{}/{},{}/realtime.json?unit={}", self.api_version, self.api_key, self.longitude, self.latitude, self.is_metric)).content
-                current = json.loads(json_text)
-
-                json_text = requests.get(str.format("https://api.caiyunapp.com/{}/{}/{},{}/forecast.json?unit={}&dailysteps={}&alert=true", self.api_version, self.api_key, self.longitude, self.latitude, self.is_metric, self.forecast)).content
-
-                forecast = (
-                    json.loads(json_text)
-                    if self.forecast
-                    else {}
-                )
+                url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, self.alert, self.is_metric, self.start_timestamp)
+                json_text = requests.get(url).content
+                resdata = json.loads(json_text)
         except (
             ClientConnectorError
         ) as error:
             raise UpdateFailed(error)
-        _LOGGER.debug("Requests remaining: %s", current)
-        _LOGGER.debug("Requests remaining: %s", forecast)
-        return {**current, **{ATTR_FORECAST: forecast,"location_key":self.location_key,"is_metric":self.is_metric}}
+        _LOGGER.debug("Requests remaining: %s", url)
+        return {**resdata,"location_key":self.location_key,"is_metric":self.is_metric}
 
 

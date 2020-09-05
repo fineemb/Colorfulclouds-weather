@@ -11,8 +11,10 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from .const import (
     DOMAIN,
-    CONF_FORECAST,
-    CONF_ALERT
+    CONF_HOURLYSTEPS,
+    CONF_DAILYSTEPS,
+    CONF_ALERT,
+    CONF_STARTTIME
     )
 import voluptuous as vol
 
@@ -32,9 +34,6 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input={}):
         self._errors = {}
-        if self.hass.data.get(DOMAIN):
-            return self.async_abort(reason="single_instance_allowed")
-
         if user_input is not None:
             # Check if entered host is already in HomeAssistant
             existing = await self._check_existing(user_input[CONF_NAME])
@@ -48,6 +47,7 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             status = redata['status']
             if status == "ok":
                 await self.async_set_unique_id(f"{user_input['longitude']}-{user_input['latitude']}".replace(".","_"))
+                self._abort_if_unique_id_configured()
                 return self.async_create_entry(
                     title=user_input[CONF_NAME], data=user_input
                 )
@@ -62,16 +62,6 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Defaults
         api_version = "v2.5"
-
-        # if user_input is not None:
-        #     if "api_key" in user_input:
-        #         api_key = user_input["api_key"]
-        #     if "api_version" in user_input:
-        #         api_version = user_input["api_version"]
-        #     if "longitude" in user_input:
-        #         longitude = user_input["longitude"]
-        #     if "latitude" in user_input:
-        #         location = user_input["latitude"]
         data_schema = OrderedDict()
         data_schema[vol.Required(CONF_API_KEY)] = str
         data_schema[vol.Optional("api_version", default=api_version)] = str
@@ -119,9 +109,17 @@ class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_FORECAST,
-                        default=self.config_entry.options.get(CONF_FORECAST, 15),
-                    ): int,
+                        CONF_DAILYSTEPS,
+                        default=self.config_entry.options.get(CONF_DAILYSTEPS, 5),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=5, max=15)),
+                    vol.Optional(
+                        CONF_HOURLYSTEPS,
+                        default=self.config_entry.options.get(CONF_HOURLYSTEPS, 24),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=24, max=360)),
+                    vol.Optional(
+                        CONF_STARTTIME,
+                        default=self.config_entry.options.get(CONF_STARTTIME, 0),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=-5, max=0)),
                     vol.Optional(
                         CONF_ALERT,
                         default=self.config_entry.options.get(CONF_ALERT, True),

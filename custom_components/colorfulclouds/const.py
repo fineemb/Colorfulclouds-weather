@@ -47,7 +47,7 @@ from homeassistant.const import (
 
 ATTRIBUTION = "Data provided by Colorfulclouds"
 ATTR_ICON = "icon"
-ATTR_FORECAST = CONF_FORECAST = "forecast"
+ATTR_FORECAST = CONF_DAILYSTEPS = "forecast"
 ATTR_LABEL = "label"
 ATTR_UNIT_IMPERIAL = "Imperial"
 ATTR_UNIT_METRIC = "Metric"
@@ -59,6 +59,9 @@ CONF_API_VERSION = "api_version"
 CONF_LATITUDE = "latitude"
 CONF_LONGITUDE = "longitude"
 CONF_ALERT = "alert"
+CONF_HOURLYSTEPS = "hourlysteps"
+CONF_DAILYSTEPS = "dailysteps"
+CONF_STARTTIME = "starttime"
 
 COORDINATOR = "coordinator"
 

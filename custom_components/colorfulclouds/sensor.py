@@ -9,7 +9,6 @@ from homeassistant.const import (
 from homeassistant.helpers.entity import Entity
 
 from .const import (
-    ATTR_FORECAST,
     ATTR_ICON,
     ATTR_LABEL,
     ATTRIBUTION,

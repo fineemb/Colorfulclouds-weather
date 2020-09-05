@@ -26,8 +26,10 @@
         "step": {
             "user":{
                 "data": {
-                    "forecast": "预报天数 (0为不获取)",
-                    "alert": "极端天气预警"
+                    "dailysteps": "天级预报(5-15)",
+                    "hourlysteps": "小时级预报(24-360)",
+                    "alert": "极端天气预警",
+                    "starttime": "预报起始时间,-1 是昨天,-2 是前天"
                 },
                 "description": "设置你需要获取预报数据的天数,以及极端天气预警数据"
             }
