@@ -74,7 +74,7 @@ class ColorfulCloudsEntity(WeatherEntity):
     def __init__(self, name, coordinator):
         
         self.coordinator = coordinator
-        _LOGGER.debug("coordinator: %s", coordinator.data)
+        _LOGGER.debug("coordinator: %s", coordinator.data["server_time"])
         self._name = name
         self._attrs = {}
         self._unit_system = "Metric" if self.coordinator.data["is_metric"]=="metric:v2" else "Imperial"
@@ -286,5 +286,7 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     async def async_update(self):
         """Update Colorfulclouds entity."""
-        await self.coordinator.async_request_refresh()
         _LOGGER.debug("weather_update: %s", self.coordinator.data['server_time'])
+        
+        await self.coordinator.async_request_refresh()
+        

@@ -4,7 +4,7 @@ Github        : https://github.com/fineemb
 Description   : 
 Date          : 2020-06-07 16:40:38
 LastEditors   : fineemb
-LastEditTime  : 2020-09-03 12:51:56
+LastEditTime  : 2020-09-11 10:51:43
 '''
 """
 Component to integrate with 彩云天气.
@@ -125,7 +125,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         self.hourlysteps = hourlysteps
         self.api_version = api_version
         self.api_key = api_key
-        self.start_timestamp = int((datetime.datetime.now()+datetime.timedelta(days=starttime)).timestamp())
+        self.starttime = starttime
         self.is_metric = hass.config.units.is_metric
         if hass.config.units.is_metric:
             self.is_metric = "metric:v2"
@@ -133,7 +133,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
             self.is_metric = "imperial"
 
         update_interval = (
-            datetime.timedelta(minutes=4)
+            datetime.timedelta(minutes=2)
         )
         _LOGGER.debug("Data will be update every %s", update_interval)
 
@@ -143,7 +143,8 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
         try:
             async with timeout(10):
-                url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, self.alert, self.is_metric, self.start_timestamp)
+                start_timestamp = int((datetime.datetime.now()+datetime.timedelta(days=self.starttime)).timestamp())
+                url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, self.alert, self.is_metric, start_timestamp)
                 json_text = requests.get(url).content
                 resdata = json.loads(json_text)
         except (

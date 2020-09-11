@@ -107,8 +107,8 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:gauge",
         ATTR_LABEL: "气压",
-        ATTR_UNIT_METRIC: None,
-        ATTR_UNIT_IMPERIAL: None,
+        ATTR_UNIT_METRIC: "Pa",
+        ATTR_UNIT_IMPERIAL: "Pa",
     },
     "comfort": {
         ATTR_DEVICE_CLASS: None,
