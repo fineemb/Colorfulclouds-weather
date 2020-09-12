@@ -4,7 +4,7 @@ Github        : https://github.com/fineemb
 Description   : 
 Date          : 2020-06-07 16:40:38
 LastEditors   : fineemb
-LastEditTime  : 2020-09-11 10:51:43
+LastEditTime  : 2020-09-12 20:07:33
 '''
 """
 Component to integrate with 彩云天气.
@@ -139,14 +139,20 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)
 
+    # @asyncio.coroutine
+    def get_data(self, url):
+        json_text = requests.get(url).content
+        resdata = json.loads(json_text)
+        return resdata
+
     async def _async_update_data(self):
         """Update data via library."""
         try:
             async with timeout(10):
                 start_timestamp = int((datetime.datetime.now()+datetime.timedelta(days=self.starttime)).timestamp())
                 url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, self.alert, self.is_metric, start_timestamp)
-                json_text = requests.get(url).content
-                resdata = json.loads(json_text)
+                # json_text = requests.get(url).content
+                resdata =  await self.hass.async_add_executor_job(self.get_data, url)
         except (
             ClientConnectorError
         ) as error:
