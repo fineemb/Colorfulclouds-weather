@@ -39,7 +39,6 @@ from homeassistant.const import (
     TEMP_CELSIUS,
     TEMP_FAHRENHEIT,
     TIME_HOURS,
-    UNIT_PERCENTAGE,
     DEGREE,
     UV_INDEX,
     VOLUME_CUBIC_METERS,
@@ -93,8 +92,8 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:weather-cloudy",
         ATTR_LABEL: "云量",
-        ATTR_UNIT_METRIC: UNIT_PERCENTAGE,
-        ATTR_UNIT_IMPERIAL: UNIT_PERCENTAGE,
+        ATTR_UNIT_METRIC: "%",
+        ATTR_UNIT_IMPERIAL: "%",
     },
     "precipitation": {
         ATTR_DEVICE_CLASS: None,
