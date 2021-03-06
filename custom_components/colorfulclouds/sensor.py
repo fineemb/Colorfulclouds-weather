@@ -122,7 +122,7 @@ class ColorfulcloudsSensor(Entity):
         if self.kind == "temperature":
             return self.coordinator.data["result"]["realtime"][self.kind]
         if self.kind == "humidity":
-            return self.coordinator.data["result"]["realtime"][self.kind]
+            return round(float(self.coordinator.data["result"]["realtime"][self.kind])*100)
         if self.kind == "cloudrate":
             return self.coordinator.data["result"]["realtime"][self.kind]
         if self.kind == "visibility":
