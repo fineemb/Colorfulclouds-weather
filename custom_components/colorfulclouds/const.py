@@ -127,8 +127,8 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:water-percent",
         ATTR_LABEL: "湿度",
-        ATTR_UNIT_METRIC: TEMP_CELSIUS,
-        ATTR_UNIT_IMPERIAL: TEMP_FAHRENHEIT,
+        ATTR_UNIT_METRIC: "%",
+        ATTR_UNIT_IMPERIAL: "%",
     },
     "visibility": {
         ATTR_DEVICE_CLASS: None,

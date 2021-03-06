@@ -4,6 +4,7 @@
   "documentation": "https://github.com/fineemb/Colorfulclouds-weather",
   "issue_tracker": "https://github.com/fineemb/Colorfulclouds-weather/issues",
   "dependencies": [],
+  "version": "1.2.4",
   "config_flow": true,
   "codeowners": ["@fineemb"],
   "requirements": []
