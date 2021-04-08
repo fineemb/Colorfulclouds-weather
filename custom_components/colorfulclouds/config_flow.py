@@ -31,6 +31,12 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize."""
         self._errors = {}
+    
+    # @asyncio.coroutine
+    def get_data(self, url):
+        json_text = requests.get(url).content
+        resdata = json.loads(json_text)
+        return resdata
 
     async def async_step_user(self, user_input={}):
         self._errors = {}
@@ -41,9 +47,8 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="already_configured")
 
             # If it is not, continue with communication test
-            json_text = requests.get(str.format("https://api.caiyunapp.com/{}/{}/{},{}/daily.json", user_input["api_version"], user_input["api_key"], user_input["longitude"], user_input["latitude"])).content
-            _LOGGER.debug(json_text)
-            redata = json.loads(json_text)
+            url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/daily.json", user_input["api_version"], user_input["api_key"], user_input["longitude"], user_input["latitude"])
+            redata = await self.hass.async_add_executor_job(self.get_data, url)
             status = redata['status']
             if status == "ok":
                 await self.async_set_unique_id(f"{user_input['longitude']}-{user_input['latitude']}".replace(".","_"))
