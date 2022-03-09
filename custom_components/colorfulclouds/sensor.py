@@ -82,7 +82,7 @@ class ColorfulcloudsSensor(Entity):
             "identifiers": {(DOMAIN, self.coordinator.data["location_key"])},
             "name": self._name,
             "manufacturer": MANUFACTURER,
-            "entry_type": "service",
+            "DeviceEntryType": "service",
         }
 
     @property
@@ -160,7 +160,7 @@ class ColorfulcloudsSensor(Entity):
         return SENSOR_TYPES[self.kind][self._unit_system]
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         # if self.forecast_day is not None:
         #     if self.kind in ["WindGustDay", "WindGustNight"]:
