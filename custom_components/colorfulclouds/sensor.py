@@ -7,6 +7,7 @@ from homeassistant.const import (
     DEVICE_CLASS_TEMPERATURE,
 )
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.device_registry import DeviceEntryType
 
 from .const import (
     ATTR_ICON,
@@ -82,7 +83,7 @@ class ColorfulcloudsSensor(Entity):
             "identifiers": {(DOMAIN, self.coordinator.data["location_key"])},
             "name": self._name,
             "manufacturer": MANUFACTURER,
-            "DeviceEntryType": "service",
+            "DeviceEntryType": DeviceEntryType.SERVICE,
         }
 
     @property

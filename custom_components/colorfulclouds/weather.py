@@ -4,6 +4,7 @@ import logging
 import json
 from datetime import datetime, timedelta
 
+from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.components.weather import (
     WeatherEntity, 
     ATTR_FORECAST_CONDITION, 
@@ -101,7 +102,7 @@ class ColorfulCloudsEntity(WeatherEntity):
             "identifiers": {(DOMAIN, self.coordinator.data["location_key"])},
             "name": self._name,
             "manufacturer": MANUFACTURER,
-            "DeviceEntryType": "service",
+            "DeviceEntryType": DeviceEntryType.SERVICE,
         }
     @property
     def should_poll(self):
