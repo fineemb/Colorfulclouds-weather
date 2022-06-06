@@ -9,7 +9,7 @@
 
 # 彩云天气
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
 
 使用最新的v2.5彩云api, [自己去申请key](https://www.caiyunapp.com/dev_center/login.html)
 
