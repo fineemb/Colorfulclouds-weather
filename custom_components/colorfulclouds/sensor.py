@@ -83,7 +83,7 @@ class ColorfulcloudsSensor(Entity):
             "identifiers": {(DOMAIN, self.coordinator.data["location_key"])},
             "name": self._name,
             "manufacturer": MANUFACTURER,
-            "DeviceEntryType": DeviceEntryType.SERVICE,
+            "entry_type": DeviceEntryType.SERVICE,
         }
 
     @property
