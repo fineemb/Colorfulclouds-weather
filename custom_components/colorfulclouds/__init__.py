@@ -134,7 +134,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
             self.is_metric = "imperial"
 
         update_interval = (
-            datetime.timedelta(minutes=2)
+            datetime.timedelta(minutes=6)
         )
         _LOGGER.debug("Data will be update every %s", update_interval)
 
