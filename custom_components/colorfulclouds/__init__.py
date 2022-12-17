@@ -151,7 +151,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             async with timeout(10):
                 start_timestamp = int((datetime.datetime.now()+datetime.timedelta(days=self.starttime)).timestamp())
-                url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, self.alert, self.is_metric, start_timestamp)
+                url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}", self.api_version, self.api_key, self.longitude, self.latitude, self.dailysteps, self.hourlysteps, str(self.alert).lower(), self.is_metric, start_timestamp)
                 # json_text = requests.get(url).content
                 resdata =  await self.hass.async_add_executor_job(self.get_data, url)
         except (
