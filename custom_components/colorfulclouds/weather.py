@@ -1,5 +1,7 @@
 
 
+
+
 import logging
 import json
 from datetime import datetime, timedelta
@@ -121,11 +123,11 @@ class ColorfulCloudsEntity(WeatherEntity):
         return CONDITION_MAP[skycon]
 
     @property
-    def temperature(self):
+    def native_temperature(self):
         return self.coordinator.data["result"]['realtime']['temperature']
 
     @property
-    def temperature_unit(self):
+    def native_temperature_unit(self):
         return TEMP_CELSIUS if self.coordinator.data["is_metric"]=="metric:v2" else TEMP_FAHRENHEIT
 
     @property
@@ -133,7 +135,7 @@ class ColorfulCloudsEntity(WeatherEntity):
         return float(self.coordinator.data["result"]['realtime']['humidity']) * 100
 
     @property
-    def wind_speed(self):
+    def native_wind_speed(self):
         """风速"""
         return self.coordinator.data["result"]['realtime']['wind']['speed']
 
@@ -143,12 +145,12 @@ class ColorfulCloudsEntity(WeatherEntity):
         return self.coordinator.data["result"]['realtime']['wind']['direction']
 
     @property
-    def visibility(self):
+    def native_visibility(self):
         """能见度"""
         return self.coordinator.data["result"]['realtime']['visibility']
 
     @property
-    def pressure(self):
+    def native_pressure(self):
         return self.coordinator.data["result"]['realtime']['pressure']
 
     @property
@@ -291,3 +293,4 @@ class ColorfulCloudsEntity(WeatherEntity):
         
         await self.coordinator.async_request_refresh()
         
+
