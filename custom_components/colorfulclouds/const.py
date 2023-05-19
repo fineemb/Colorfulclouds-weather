@@ -28,6 +28,8 @@ If you have any issues with this you need to open an issue here:
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_PM25,
+    CONCENTRATION_PARTS_PER_MILLION,
     LENGTH_FEET,
     LENGTH_INCHES,
     LENGTH_METERS,
@@ -151,6 +153,13 @@ SENSOR_TYPES = {
         ATTR_UNIT_METRIC: DEGREE,
         ATTR_UNIT_IMPERIAL: DEGREE,
     },
+    "pm25": {
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_PM25,
+        ATTR_ICON: "mdi:lungs",
+        ATTR_LABEL: "PM 2.5",
+        ATTR_UNIT_METRIC: CONCENTRATION_PARTS_PER_MILLION,
+        ATTR_UNIT_IMPERIAL: CONCENTRATION_PARTS_PER_MILLION,
+    }
 }
 
 
