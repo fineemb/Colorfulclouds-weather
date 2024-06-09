@@ -2,6 +2,6 @@
     "name": "彩云天气",
     "domains": ["weather","sensor"],
     "render_readme": true,
-    "homeassistant": "0.99.9",
+    "homeassistant": "2022.3.0",
     "country": ["CN"]
   }

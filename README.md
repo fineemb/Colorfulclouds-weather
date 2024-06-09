@@ -44,6 +44,17 @@
 + ### v1.2.7
   + 修复系统单位获取问题 #32
   + 极端天气预警修复 #14
++ ### v2.0.0
+  + 重新适配更高版本的HASS [#52](https://github.com/fineemb/Colorfulclouds-weather/issues/52)
+  [#47](https://github.com/fineemb/Colorfulclouds-weather/issues/47)
+  [#50](https://github.com/fineemb/Colorfulclouds-weather/issues/50)
+  [#51](https://github.com/fineemb/Colorfulclouds-weather/issues/51)
+  [#49](https://github.com/fineemb/Colorfulclouds-weather/issues/49)
+  [#48](https://github.com/fineemb/Colorfulclouds-weather/issues/48)
+  [#46](https://github.com/fineemb/Colorfulclouds-weather/issues/46)
+  [#45](https://github.com/fineemb/Colorfulclouds-weather/issues/45)
+  
+  + 天气预报和小时预报不再写入状态机,[前端卡片](https://github.com/fineemb/lovelace-colorfulclouds-weather-card)将会同步更新
   
 ## 安装配置
 

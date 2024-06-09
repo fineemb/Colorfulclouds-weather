@@ -1,50 +1,15 @@
+"""Constants for the colorfulClouds integration."""
 
-
-"""Constants for colorfulclouds."""
 DOMAIN = "colorfulclouds"
 
-PLATFORMS = ["sensor"]
-REQUIRED_FILES = [
-    "const.py",
-    "manifest.json",
-    "weather.py",
-    "config_flow.py",
-    "services.yaml",
-    "translations/en.json",
-]
-VERSION = "0.1.3"
-ISSUE_URL = "https://github.com/fineemb/Colorfulclouds-weather/issues"
+CONF_ALERT = "alert"
+CONF_HOURLYSTEPS = "hourlysteps"
+CONF_DAILYSTEPS = "dailysteps"
+CONF_STARTTIME = "starttime"
 
-STARTUP = """
--------------------------------------------------------------------
-{name}
-Version: {version}
-This is a custom component
-If you have any issues with this you need to open an issue here:
-{issueurl}
--------------------------------------------------------------------
-"""
+COORDINATOR = "coordinator"
 
-from homeassistant.const import (
-    ATTR_DEVICE_CLASS,
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_PM25,
-    CONCENTRATION_PARTS_PER_MILLION,
-    LENGTH_FEET,
-    LENGTH_INCHES,
-    LENGTH_METERS,
-    SPEED_KILOMETERS_PER_HOUR,
-    SPEED_MILES_PER_HOUR,
-    LENGTH_MILES,
-    LENGTH_KILOMETERS,
-    LENGTH_INCHES,
-    TEMP_CELSIUS,
-    TEMP_FAHRENHEIT,
-    TIME_HOURS,
-    DEGREE,
-    UV_INDEX,
-    VOLUME_CUBIC_METERS,
-)
+UNDO_UPDATE_LISTENER = "undo_update_listener"
 
 ATTRIBUTION = "Data provided by Colorfulclouds"
 ATTR_ICON = "icon"
@@ -55,40 +20,23 @@ ATTR_UNIT_METRIC = "Metric"
 MANUFACTURER = "Colorfulclouds, Inc."
 NAME = "Colorfulclouds"
 
-CONF_API_KEY = "api_key"
-CONF_API_VERSION = "api_version"
-CONF_LATITUDE = "latitude"
-CONF_LONGITUDE = "longitude"
-CONF_ALERT = "alert"
-CONF_HOURLYSTEPS = "hourlysteps"
-CONF_DAILYSTEPS = "dailysteps"
-CONF_STARTTIME = "starttime"
+from homeassistant.const import ATTR_DEVICE_CLASS, DEGREE, UV_INDEX
 
-COORDINATOR = "coordinator"
-
-UNDO_UPDATE_LISTENER = "undo_update_listener"
-
-
-OPTIONAL_SENSORS = (
-
-    "WindDirection",
-)
-
-
+OPTIONAL_SENSORS = ()
 SENSOR_TYPES = {
     "apparent_temperature": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
+        ATTR_DEVICE_CLASS: "temperature",
         ATTR_ICON: None,
         ATTR_LABEL: "感觉温度",
-        ATTR_UNIT_METRIC: TEMP_CELSIUS,
-        ATTR_UNIT_IMPERIAL: TEMP_FAHRENHEIT,
+        ATTR_UNIT_METRIC: "°C",
+        ATTR_UNIT_IMPERIAL: "°F",
     },
     "temperature": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
+        ATTR_DEVICE_CLASS: "temperature",
         ATTR_ICON: None,
         ATTR_LABEL: "温度",
-        ATTR_UNIT_METRIC: TEMP_CELSIUS,
-        ATTR_UNIT_IMPERIAL: TEMP_FAHRENHEIT,
+        ATTR_UNIT_METRIC: "°C",
+        ATTR_UNIT_IMPERIAL: "°F",
     },
     "cloudrate": {
         ATTR_DEVICE_CLASS: None,
@@ -102,7 +50,7 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:weather-rainy",
         ATTR_LABEL: "雨量",
         ATTR_UNIT_METRIC: "mm",
-        ATTR_UNIT_IMPERIAL: LENGTH_INCHES,
+        ATTR_UNIT_IMPERIAL: "in",
     },
     "pressure": {
         ATTR_DEVICE_CLASS: None,
@@ -136,31 +84,21 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:weather-fog",
         ATTR_LABEL: "能见度",
-        ATTR_UNIT_METRIC: LENGTH_KILOMETERS,
-        ATTR_UNIT_IMPERIAL: LENGTH_MILES,
+        ATTR_UNIT_METRIC: "km",
+        ATTR_UNIT_IMPERIAL: "mi",
     },
     "WindSpeed": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:weather-windy",
         ATTR_LABEL: "风速",
-        ATTR_UNIT_METRIC: SPEED_KILOMETERS_PER_HOUR,
-        ATTR_UNIT_IMPERIAL: SPEED_MILES_PER_HOUR,
+        ATTR_UNIT_METRIC: "km/h",
+        ATTR_UNIT_IMPERIAL: "mph",
     },
     "WindDirection": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:weather-windy",
+        ATTR_ICON: "mdi:windsock",
         ATTR_LABEL: "风向",
         ATTR_UNIT_METRIC: DEGREE,
         ATTR_UNIT_IMPERIAL: DEGREE,
     },
-    "pm25": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_PM25,
-        ATTR_ICON: "mdi:lungs",
-        ATTR_LABEL: "PM 2.5",
-        ATTR_UNIT_METRIC: CONCENTRATION_PARTS_PER_MILLION,
-        ATTR_UNIT_IMPERIAL: CONCENTRATION_PARTS_PER_MILLION,
-    }
 }
-
-
-

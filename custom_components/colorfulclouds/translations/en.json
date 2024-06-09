@@ -1,13 +1,13 @@
 {
     "config": {
-        "title": "Colorfulclouds Weather",
+        "title": "Colorful Clouds",
         "step": {
             "user": {
-                "title": "Colorfulclouds Weather",
-                "description": "If you need help with the configuration have a look here: https://github.com/fineemb/Colorfulclouds-weather",
+                "title": "Colorful Clouds",
+                "description": "If you need help with configuration, check here: https://github.com/fineemb/Colorfulclouds-weather",
                 "data": {
                     "api_key": "API Key",
-                    "api_version": "API version, default: v2.5",
+                    "api_version": "API version,The default is v2.5",
                     "latitude" : "Latitude",
                     "longitude" : "Longitude",
                     "name" : "Name"
@@ -15,23 +15,23 @@
             }
         },
         "error": {
-            "communication": "Key may be invalid, please check the input value."
+            "communication": "The key may be invalid, please check the input value."
         },
         "abort": {
-            "single_instance_allowed": "Only a single configuration of Colorfulclouds Weather is allowed.",
-            "already_configured": "This is already configured."
+            "single_instance_allowed": "Only a single configuration is allowed.",
+            "already_configured": "Do not repeat the configuration."
         }
     },
     "options": {
         "step": {
             "user":{
                 "data": {
-                    "dailysteps": "Forecast days (5-15)",
-                    "hourlysteps": "Forecast hours (24-360)",
-                    "alert": "Extreme weather warning",
-                    "starttime": "Start time (-2 ~ 0)"
+                    "dailysteps": "Day Forecast (5-15)",
+                    "hourlysteps": "Hourly forecast (24-360)",
+                    "alert": "Extreme weather warnings",
+                    "starttime": "The forecast start time, -1 is yesterday, -2 is the day before yesterday"
                 },
-                "description": "Set the number of days you need to obtain forecast data, 0 means no"
+                "description": "Set the number of days you need to get forecast data, as well as extreme weather warning data"
             }
         }
     }

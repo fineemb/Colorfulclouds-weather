@@ -1,24 +1,34 @@
+"""Config flow for colorfulClouds integration."""
 
-"""Adds config flow for Colorfulclouds."""
-import logging
-import requests
-import json
-import homeassistant.helpers.config_validation as cv
-from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from __future__ import annotations
 
 from collections import OrderedDict
-from homeassistant import config_entries
-from homeassistant.core import callback
-from .const import (
-    DOMAIN,
-    CONF_HOURLYSTEPS,
-    CONF_DAILYSTEPS,
-    CONF_ALERT,
-    CONF_STARTTIME
-    )
+import json
+import logging
+
+import requests
 import voluptuous as vol
 
+from homeassistant import config_entries
+from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
+from homeassistant.core import callback
+from homeassistant.exceptions import HomeAssistantError
+import homeassistant.helpers.config_validation as cv
+
+from .const import CONF_ALERT, CONF_DAILYSTEPS, CONF_HOURLYSTEPS, CONF_STARTTIME, DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
+
+# TODO adjust the data schema to the data that you need
+# STEP_USER_DATA_SCHEMA = vol.Schema(
+#     {
+#         vol.Required(CONF_API_KEY): str,
+#         vol.Required(CONF_LATITUDE): str,
+#         vol.Required(CONF_LONGITUDE): str,
+#         vol.Required(CONF_API_VERSION): str,
+#     }
+# )
+
 
 @config_entries.HANDLERS.register(DOMAIN)
 class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -31,7 +41,7 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize."""
         self._errors = {}
-    
+
     # @asyncio.coroutine
     def get_data(self, url):
         json_text = requests.get(url).content
@@ -47,11 +57,21 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="already_configured")
 
             # If it is not, continue with communication test
-            url = str.format("https://api.caiyunapp.com/{}/{}/{},{}/daily.json", user_input["api_version"], user_input["api_key"], user_input["longitude"], user_input["latitude"])
+            url = str.format(
+                "https://api.caiyunapp.com/{}/{}/{},{}/daily.json",
+                user_input["api_version"],
+                user_input["api_key"],
+                user_input["longitude"],
+                user_input["latitude"],
+            )
             redata = await self.hass.async_add_executor_job(self.get_data, url)
-            status = redata['status']
+            status = redata["status"]
             if status == "ok":
-                await self.async_set_unique_id(f"{user_input['longitude']}-{user_input['latitude']}".replace(".","_"))
+                await self.async_set_unique_id(
+                    f"{user_input['longitude']}-{user_input['latitude']}".replace(
+                        ".", "_"
+                    )
+                )
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(
                     title=user_input[CONF_NAME], data=user_input
@@ -64,15 +84,20 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return await self._show_config_form(user_input)
 
     async def _show_config_form(self, user_input):
-
         # Defaults
         api_version = "v2.5"
         data_schema = OrderedDict()
         data_schema[vol.Required(CONF_API_KEY)] = str
         data_schema[vol.Optional("api_version", default=api_version)] = str
-        data_schema[vol.Optional(CONF_LONGITUDE, default=self.hass.config.longitude)] = cv.longitude
-        data_schema[vol.Optional(CONF_LATITUDE, default=self.hass.config.latitude)] = cv.latitude
-        data_schema[vol.Optional(CONF_NAME, default=self.hass.config.location_name)] = str
+        data_schema[
+            vol.Optional(CONF_LONGITUDE, default=self.hass.config.longitude)
+        ] = cv.longitude
+        data_schema[vol.Optional(CONF_LATITUDE, default=self.hass.config.latitude)] = (
+            cv.latitude
+        )
+        data_schema[vol.Optional(CONF_NAME, default=self.hass.config.location_name)] = (
+            str
+        )
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(data_schema), errors=self._errors
         )
@@ -92,6 +117,7 @@ class ColorfulcloudslowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         for entry in self._async_current_entries():
             if host == entry.data.get(CONF_NAME):
                 return True
+
 
 class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
     """Config flow options for Colorfulclouds."""
@@ -128,8 +154,15 @@ class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
                     vol.Optional(
                         CONF_ALERT,
                         default=self.config_entry.options.get(CONF_ALERT, True),
-                    ): bool
+                    ): bool,
                 }
             ),
         )
 
+
+class CannotConnect(HomeAssistantError):
+    """Error to indicate we cannot connect."""
+
+
+class InvalidAuth(HomeAssistantError):
+    """Error to indicate there is invalid auth."""

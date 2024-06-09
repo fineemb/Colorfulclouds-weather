@@ -1,12 +1,15 @@
 {
   "domain": "colorfulclouds",
-  "name": "colorfulclouds",
+  "name": "colorfulClouds",
+  "codeowners": ["@fineembs"],
+  "config_flow": true,
+  "dependencies": [],
   "documentation": "https://github.com/fineemb/Colorfulclouds-weather",
   "issue_tracker": "https://github.com/fineemb/Colorfulclouds-weather/issues",
-  "dependencies": [],
-  "version": "1.2.6",
-  "iot_class": "cloud_polling", 
-  "config_flow": true,
-  "codeowners": ["@fineemb"],
-  "requirements": []
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "2.0.0",
+  "ssdp": [],
+  "zeroconf": []
 }
