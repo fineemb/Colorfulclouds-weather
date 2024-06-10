@@ -88,7 +88,12 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     def __init__(self, name, coordinator):
         self.coordinator = coordinator
-        _LOGGER.debug("coordinator: %s", coordinator.data["server_time"])
+        # _LOGGER.debug("coordinator: %s", coordinator.data["server_time"])
+        self.coordinator.data["result"].setdefault("minutely", "null")
+        self.coordinator.data["result"].setdefault("alert", "null")
+        self.coordinator.data["result"].setdefault("hourly", "null")
+        self.coordinator.data["result"].setdefault("daily", "null")
+        self.coordinator.data["result"].setdefault("forecast_keypoint", "null")
         self._name = name
         self._attrs = {}
         self._unit_system = (
