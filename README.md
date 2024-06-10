@@ -53,6 +53,8 @@
   [#48](https://github.com/fineemb/Colorfulclouds-weather/issues/48)
   [#46](https://github.com/fineemb/Colorfulclouds-weather/issues/46)
   [#45](https://github.com/fineemb/Colorfulclouds-weather/issues/45)
++ ### v2.0.1
+  + 修复因彩云api返回数据不完整导致的崩溃
   
   + 天气预报和小时预报不再写入状态机,[前端卡片](https://github.com/fineemb/lovelace-colorfulclouds-weather-card)将会同步更新
   
