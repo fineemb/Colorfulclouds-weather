@@ -38,12 +38,12 @@
   + 适配hass规范
 
 + ### v1.2.5
-  + 修复配置页面错误 #11
+  + 修复配置页面错误 [#11](https://github.com/fineemb/Colorfulclouds-weather/issues/11)
 + ### v1.2.6
-  + 适配HASS v2022.3+ #21
+  + 适配HASS v2022.3+ [#21](https://github.com/fineemb/Colorfulclouds-weather/issues/21)
 + ### v1.2.7
-  + 修复系统单位获取问题 #32
-  + 极端天气预警修复 #14
+  + 修复系统单位获取问题 [#32](https://github.com/fineemb/Colorfulclouds-weather/issues/32)
+  + 极端天气预警修复 [#14](https://github.com/fineemb/Colorfulclouds-weather/issues/14)
 + ### v2.0.0
   + 重新适配更高版本的HASS [#52](https://github.com/fineemb/Colorfulclouds-weather/issues/52)
   [#47](https://github.com/fineemb/Colorfulclouds-weather/issues/47)
