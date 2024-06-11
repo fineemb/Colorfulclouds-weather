@@ -56,6 +56,9 @@
   + 天气预报和小时预报不再写入状态机,[前端卡片](https://github.com/fineemb/lovelace-colorfulclouds-weather-card)将会同步更新
 + ### v2.0.1
   + 修复因彩云api返回数据不完整导致的崩溃 [#53](https://github.com/fineemb/Colorfulclouds-weather/issues/53)
++ ### v2.0.2
+  + 彩云api不返回分钟预报数据 [#54](https://github.com/fineemb/Colorfulclouds-weather/issues/54)
+  + 添加自定义api请求间隔时间（默认是10分钟）
   
 ## 安装配置
 

@@ -19,7 +19,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass,
-        session,
+        websession,
         api_key,
         api_version,
         location_key,
@@ -29,6 +29,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         hourlysteps: int,
         alert: bool,
         starttime: int,
+        interval: int,
     ):
         """Initialize."""
         self.location_key = location_key
@@ -36,6 +37,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         self.latitude = latitude
         self.dailysteps = dailysteps
         self.alert = alert
+        self.interval = interval
         self.hourlysteps = hourlysteps
         self.api_version = api_version
         self.api_key = api_key
@@ -46,7 +48,7 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         else:
             self.is_metric = "imperial"
 
-        update_interval = datetime.timedelta(minutes=6)
+        update_interval = datetime.timedelta(minutes=self.interval)
         _LOGGER.debug("Data will be update every %s", update_interval)
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)

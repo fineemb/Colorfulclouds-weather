@@ -18,6 +18,7 @@ from .const import (
     CONF_DAILYSTEPS,
     CONF_HOURLYSTEPS,
     CONF_STARTTIME,
+    CONF_INTERVAL,
     COORDINATOR,
     DOMAIN,
     UNDO_UPDATE_LISTENER,
@@ -50,6 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     hourlysteps = config_entry.options.get(CONF_HOURLYSTEPS, 24)
     alert = config_entry.options.get(CONF_ALERT, True)
     starttime = config_entry.options.get(CONF_STARTTIME, 0)
+    interval = config_entry.options.get(CONF_INTERVAL, 10)
     # _LOGGER.debug("Using location_key: %s, get forecast: %s", location_key, api_version)
     websession = async_get_clientsession(hass)
     coordinator = ColorfulcloudsDataUpdateCoordinator(
@@ -64,6 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         hourlysteps,
         alert,
         starttime,
+        interval,
     )
     await coordinator.async_config_entry_first_refresh()
     undo_listener = config_entry.add_update_listener(update_listener)

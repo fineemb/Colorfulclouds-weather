@@ -72,7 +72,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     name = config_entry.data[CONF_NAME]
 
     coordinator = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
-    _LOGGER.debug("metric: %s", coordinator.data["is_metric"])
+    # _LOGGER.debug("metric: %s", coordinator.data["is_metric"])
 
     async_add_entities([ColorfulCloudsEntity(name, coordinator)], False)
 
@@ -88,12 +88,13 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     def __init__(self, name, coordinator):
         self.coordinator = coordinator
-        # _LOGGER.debug("coordinator: %s", coordinator.data["server_time"])
-        self.coordinator.data["result"].setdefault("minutely", "null")
-        self.coordinator.data["result"].setdefault("alert", "null")
-        self.coordinator.data["result"].setdefault("hourly", "null")
-        self.coordinator.data["result"].setdefault("daily", "null")
-        self.coordinator.data["result"].setdefault("forecast_keypoint", "null")
+        self.result = coordinator.data["result"]
+        self.result.setdefault("minutely", {"probability": None, "description": None})
+        self.realtime = self.result["realtime"]
+        self.minutely = self.result["minutely"]
+        self.hourly = self.result["hourly"]
+        self.daily = self.result["daily"]
+        _LOGGER.debug("coordinator: %s", coordinator.data["server_time"])
         self._name = name
         self._attrs = {}
         self._unit_system = (
@@ -140,26 +141,26 @@ class ColorfulCloudsEntity(WeatherEntity):
     @property
     def state(self):
         """Return the weather condition."""
-        skycon = self.coordinator.data["result"]["realtime"]["skycon"]
+        skycon = self.realtime["skycon"]
         return CONDITION_MAP[skycon]
 
     @property
     def cloud_coverage(self):
-        return self.coordinator.data["result"]["realtime"]["cloudrate"]
+        return self.realtime["cloudrate"]
 
     @property
     def condition(self):
         """Return the weather condition."""
-        skycon = self.coordinator.data["result"]["realtime"]["skycon"]
+        skycon = self.realtime["skycon"]
         return CONDITION_MAP[skycon]
 
     @property
     def humidity(self):
-        return float(self.coordinator.data["result"]["realtime"]["humidity"]) * 100
+        return float(self.realtime["humidity"]) * 100
 
     @property
     def native_apparent_temperature(self):
-        return self.coordinator.data["result"]["realtime"]["apparent_temperature"]
+        return self.realtime["apparent_temperature"]
 
     @property
     def native_precipitation_unit(self):
@@ -167,7 +168,7 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     @property
     def native_pressure(self):
-        return self.coordinator.data["result"]["realtime"]["pressure"]
+        return self.realtime["pressure"]
 
     @property
     def native_pressure_unit(self):
@@ -175,7 +176,7 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     @property
     def native_temperature(self):
-        return self.coordinator.data["result"]["realtime"]["temperature"]
+        return self.realtime["temperature"]
 
     @property
     def native_temperature_unit(self):
@@ -184,7 +185,7 @@ class ColorfulCloudsEntity(WeatherEntity):
     @property
     def native_visibility(self):
         """能见度"""
-        return self.coordinator.data["result"]["realtime"]["visibility"]
+        return self.realtime["visibility"]
 
     @property
     def native_visibility_unit(self):
@@ -193,12 +194,12 @@ class ColorfulCloudsEntity(WeatherEntity):
     @property
     def native_wind_speed(self):
         """风速"""
-        return self.coordinator.data["result"]["realtime"]["wind"]["speed"]
+        return self.realtime["wind"]["speed"]
 
     @property
     def wind_bearing(self):
         """风向"""
-        return self.coordinator.data["result"]["realtime"]["wind"]["direction"]
+        return self.realtime["wind"]["direction"]
 
     @property
     def native_wind_speed_unit(self):
@@ -207,98 +208,88 @@ class ColorfulCloudsEntity(WeatherEntity):
     @property
     def uv_index(self):
         """紫外线"""
-        return self.coordinator.data["result"]["realtime"]["life_index"]["ultraviolet"][
-            "index"
-        ]
+        return self.realtime["life_index"]["ultraviolet"]["index"]
 
     @property
     def pm25(self):
         """pm25，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["pm25"]
+        return self.realtime["air_quality"]["pm25"]
 
     @property
     def pm10(self):
         """pm10，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["pm10"]
+        return self.realtime["air_quality"]["pm10"]
 
     @property
     def o3(self):
         """臭氧，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["o3"]
+        return self.realtime["air_quality"]["o3"]
 
     @property
     def no2(self):
         """二氧化氮，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["no2"]
+        return self.realtime["air_quality"]["no2"]
 
     @property
     def so2(self):
         """二氧化硫，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["so2"]
+        return self.realtime["air_quality"]["so2"]
 
     @property
     def co(self):
         """一氧化碳，质量浓度值"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["co"]
+        return self.realtime["air_quality"]["co"]
 
     @property
     def aqi(self):
         """AQI（国标）"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["aqi"]["chn"]
+        return self.realtime["air_quality"]["aqi"]["chn"]
 
     @property
     def aqi_description(self):
         """AQI（国标）"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"][
-            "description"
-        ]["chn"]
+        return self.realtime["air_quality"]["description"]["chn"]
 
     @property
     def aqi_usa(self):
         """AQI USA"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"]["aqi"]["usa"]
+        return self.realtime["air_quality"]["aqi"]["usa"]
 
     @property
     def aqi_usa_description(self):
         """AQI USA"""
-        return self.coordinator.data["result"]["realtime"]["air_quality"][
-            "description"
-        ]["usa"]
+        return self.realtime["air_quality"]["description"]["usa"]
 
     @property
     def forecast_hourly(self):
         """实时天气预报描述-小时"""
-        return self.coordinator.data["result"]["hourly"]["description"]
+        return self.hourly["description"]
 
     @property
     def forecast_minutely(self):
         """实时天气预报描述-分钟"""
-        return self.coordinator.data["result"]["minutely"]["description"]
+        return self.minutely["description"]
 
     @property
     def forecast_minutely_probability(self):
         """分钟概率"""
-        return self.coordinator.data["result"]["minutely"]["probability"]
+        return self.minutely["probability"]
 
     @property
     def forecast_alert(self):
         """天气预警"""
-        alert = (
-            self.coordinator.data["result"]["alert"]
-            if "alert" in self.coordinator.data["result"]
-            else ""
-        )
+        alert = self.result["alert"] if "alert" in self.result else ""
         return alert
 
     @property
     def forecast_keypoint(self):
         """实时天气预报描述-注意事项"""
-        return self.coordinator.data["result"]["forecast_keypoint"]
+        return self.result["forecast_keypoint"]
 
     @property
     def extra_state_attributes(self):
         self._attrs = {
-            "skycon": self.coordinator.data["result"]["realtime"]["skycon"],
+            "skycon": self.realtime["skycon"],
             "forecast_hourly": self.forecast_hourly,
             "forecast_minutely": self.forecast_minutely,
             "forecast_probability": self.forecast_minutely_probability,
@@ -319,6 +310,14 @@ class ColorfulCloudsEntity(WeatherEntity):
         }
         return self._attrs
 
+    def get_nested_attr(obj, attr, default_value=None):
+        attrs = attr.split(".")
+        for a in attrs:
+            obj = getattr(obj, a, default_value)
+            if obj == default_value:
+                break
+        return obj
+
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
         self.async_on_remove(
@@ -333,45 +332,23 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     async def async_forecast_daily(self) -> list[Forecast] | None:
         forecast_data = []
-        for i in range(len(self.coordinator.data["result"]["daily"]["temperature"])):
-            time_str = self.coordinator.data["result"]["daily"]["temperature"][i][
-                "date"
-            ]
+        for i in range(len(self.daily["temperature"])):
+            time_str = self.daily["temperature"][i]["date"]
             data_dict = {
                 ATTR_FORECAST_TIME: time_str,
-                "skycon": self.coordinator.data["result"]["daily"]["skycon"][i][
-                    "value"
-                ],
+                "skycon": self.daily["skycon"][i]["value"],
                 ATTR_FORECAST_CONDITION: CONDITION_MAP[
-                    self.coordinator.data["result"]["daily"]["skycon"][i]["value"]
+                    self.daily["skycon"][i]["value"]
                 ],
-                ATTR_FORECAST_NATIVE_TEMP: self.coordinator.data["result"]["daily"][
-                    "temperature"
-                ][i]["max"],
-                ATTR_FORECAST_NATIVE_TEMP_LOW: self.coordinator.data["result"]["daily"][
-                    "temperature"
-                ][i]["min"],
-                ATTR_FORECAST_WIND_BEARING: self.coordinator.data["result"]["daily"][
-                    "wind"
-                ][i]["avg"]["direction"],
-                ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.data["result"][
-                    "daily"
-                ]["wind"][i]["avg"]["speed"],
-                ATTR_FORECAST_PRECIPITATION: self.coordinator.data["result"]["daily"][
-                    "precipitation"
-                ][i]["avg"],
-                ATTR_FORECAST_HUMIDITY: self.coordinator.data["result"]["daily"][
-                    "humidity"
-                ][i]["avg"],
-                ATTR_WEATHER_CLOUD_COVERAGE: self.coordinator.data["result"]["daily"][
-                    "cloudrate"
-                ][i]["avg"],
-                ATTR_WEATHER_PRESSURE: self.coordinator.data["result"]["daily"][
-                    "pressure"
-                ][i]["avg"],
-                ATTR_WEATHER_VISIBILITY: self.coordinator.data["result"]["daily"][
-                    "visibility"
-                ][i]["avg"],
+                ATTR_FORECAST_NATIVE_TEMP: self.daily["temperature"][i]["max"],
+                ATTR_FORECAST_NATIVE_TEMP_LOW: self.daily["temperature"][i]["min"],
+                ATTR_FORECAST_WIND_BEARING: self.daily["wind"][i]["avg"]["direction"],
+                ATTR_FORECAST_NATIVE_WIND_SPEED: self.daily["wind"][i]["avg"]["speed"],
+                ATTR_FORECAST_PRECIPITATION: self.daily["precipitation"][i]["avg"],
+                ATTR_FORECAST_HUMIDITY: self.daily["humidity"][i]["avg"],
+                ATTR_WEATHER_CLOUD_COVERAGE: self.daily["cloudrate"][i]["avg"],
+                ATTR_WEATHER_PRESSURE: self.daily["pressure"][i]["avg"],
+                ATTR_WEATHER_VISIBILITY: self.daily["visibility"][i]["avg"],
             }
             forecast_data.append(data_dict)
 
@@ -382,43 +359,22 @@ class ColorfulCloudsEntity(WeatherEntity):
 
     async def async_forecast_hourly(self) -> list[Forecast] | None:
         forecast_data = []
-        for i in range(len(self.coordinator.data["result"]["hourly"]["temperature"])):
-            time_str = self.coordinator.data["result"]["hourly"]["temperature"][i][
-                "datetime"
-            ]
+        for i in range(len(self.hourly["temperature"])):
+            time_str = self.hourly["temperature"][i]["datetime"]
             data_dict = {
                 ATTR_FORECAST_TIME: time_str,
-                "skycon": self.coordinator.data["result"]["hourly"]["skycon"][i][
-                    "value"
-                ],
+                "skycon": self.hourly["skycon"][i]["value"],
                 ATTR_FORECAST_CONDITION: CONDITION_MAP[
-                    self.coordinator.data["result"]["hourly"]["skycon"][i]["value"]
+                    self.hourly["skycon"][i]["value"]
                 ],
-                ATTR_FORECAST_NATIVE_TEMP: self.coordinator.data["result"]["hourly"][
-                    "temperature"
-                ][i]["value"],
-                ATTR_FORECAST_WIND_BEARING: self.coordinator.data["result"]["hourly"][
-                    "wind"
-                ][i]["direction"],
-                ATTR_FORECAST_NATIVE_WIND_SPEED: self.coordinator.data["result"][
-                    "hourly"
-                ]["wind"][i]["speed"],
-                ATTR_FORECAST_PRECIPITATION: self.coordinator.data["result"]["hourly"][
-                    "precipitation"
-                ][i]["value"],
-                ATTR_WEATHER_HUMIDITY: self.coordinator.data["result"]["hourly"][
-                    "humidity"
-                ][i]["value"],
-                ATTR_WEATHER_CLOUD_COVERAGE: self.coordinator.data["result"]["hourly"][
-                    "cloudrate"
-                ][i]["value"],
-                ATTR_WEATHER_PRESSURE: self.coordinator.data["result"]["hourly"][
-                    "pressure"
-                ][i]["value"],
-                ATTR_WEATHER_VISIBILITY: self.coordinator.data["result"]["hourly"][
-                    "visibility"
-                ][i]["value"],
+                ATTR_FORECAST_NATIVE_TEMP: self.hourly["temperature"][i]["value"],
+                ATTR_FORECAST_WIND_BEARING: self.hourly["wind"][i]["direction"],
+                ATTR_FORECAST_NATIVE_WIND_SPEED: self.hourly["wind"][i]["speed"],
+                ATTR_FORECAST_PRECIPITATION: self.hourly["precipitation"][i]["value"],
+                ATTR_WEATHER_HUMIDITY: self.hourly["humidity"][i]["value"],
+                ATTR_WEATHER_CLOUD_COVERAGE: self.hourly["cloudrate"][i]["value"],
+                ATTR_WEATHER_PRESSURE: self.hourly["pressure"][i]["value"],
+                ATTR_WEATHER_VISIBILITY: self.hourly["visibility"][i]["value"],
             }
             forecast_data.append(data_dict)
-
         return forecast_data

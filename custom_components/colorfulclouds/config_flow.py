@@ -15,7 +15,14 @@ from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
 import homeassistant.helpers.config_validation as cv
 
-from .const import CONF_ALERT, CONF_DAILYSTEPS, CONF_HOURLYSTEPS, CONF_STARTTIME, DOMAIN
+from .const import (
+    CONF_ALERT,
+    CONF_DAILYSTEPS,
+    CONF_HOURLYSTEPS,
+    CONF_STARTTIME,
+    CONF_INTERVAL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -143,6 +150,10 @@ class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
                         CONF_DAILYSTEPS,
                         default=self.config_entry.options.get(CONF_DAILYSTEPS, 5),
                     ): vol.All(vol.Coerce(int), vol.Range(min=5, max=15)),
+                    vol.Optional(
+                        CONF_INTERVAL,
+                        default=self.config_entry.options.get(CONF_INTERVAL, 5),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=1)),
                     vol.Optional(
                         CONF_HOURLYSTEPS,
                         default=self.config_entry.options.get(CONF_HOURLYSTEPS, 24),

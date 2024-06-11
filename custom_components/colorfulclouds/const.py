@@ -6,6 +6,7 @@ CONF_ALERT = "alert"
 CONF_HOURLYSTEPS = "hourlysteps"
 CONF_DAILYSTEPS = "dailysteps"
 CONF_STARTTIME = "starttime"
+CONF_INTERVAL = "interval"
 
 COORDINATOR = "coordinator"
 
