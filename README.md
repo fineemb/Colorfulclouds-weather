@@ -59,7 +59,8 @@
 + ### v2.0.2
   + 彩云api不返回分钟预报数据 [#54](https://github.com/fineemb/Colorfulclouds-weather/issues/54)
   + 添加自定义api请求间隔时间（默认是10分钟）
-  
++ ### v2.0.3
+  + 修复天气实体和预报不刷新的问题 [#56](https://github.com/fineemb/Colorfulclouds-weather/issues/56)
 ## 安装配置
 
 建议使用HACS安装和配置
