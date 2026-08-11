@@ -35,11 +35,15 @@ PLATFORMS: list[Platform] = [Platform.WEATHER, Platform.SENSOR]
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Set up Colorfulclouds as config entry."""
     hass.data.setdefault(DOMAIN, {})
-    api_key = config_entry.data[CONF_API_KEY]
+    api_key = config_entry.options.get(
+        CONF_API_KEY
+    ) or config_entry.data.get(CONF_API_KEY, "")
     location_key = config_entry.unique_id
     longitude = config_entry.data[CONF_LONGITUDE]
     latitude = config_entry.data[CONF_LATITUDE]
-    api_version = config_entry.data[CONF_API_VERSION]
+    api_version = config_entry.options.get(
+        CONF_API_VERSION
+    ) or config_entry.data.get(CONF_API_VERSION, "v2.5")
     dailysteps = config_entry.options.get(CONF_DAILYSTEPS, 5)
     hourlysteps = config_entry.options.get(CONF_HOURLYSTEPS, 24)
     alert = config_entry.options.get(CONF_ALERT, True)

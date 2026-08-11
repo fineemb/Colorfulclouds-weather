@@ -28,6 +28,8 @@
             "user": {
                 "title": "彩云天气选项",
                 "data": {
+                    "api_key": "彩云API Key",
+                    "api_version": "API版本，默认v2.5",
                     "dailysteps": "天级预报(5-15)",
                     "hourlysteps": "小时级预报(24-360)",
                     "alert": "极端天气预警",
@@ -36,6 +38,10 @@
                 },
                 "description": "设置你需要获取预报数据的天数,以及极端天气预警数据"
             }
+        },
+        "error": {
+            "cannot_connect": "无法连接到彩云天气 API。",
+            "communication": "Key可能无效，请检查输入值."
         }
     }
 }

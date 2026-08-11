@@ -12,6 +12,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_API_KEY,
+    CONF_API_VERSION,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_NAME,
@@ -31,6 +32,12 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+def _fetch_api_data(url):
+    """Fetch and parse JSON from the given URL."""
+    json_text = requests.get(url, timeout=10).content
+    return json.loads(json_text)
+
+
 class ColorfulcloudsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Colorfulclouds."""
 
@@ -43,11 +50,6 @@ class ColorfulcloudsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize."""
         self._errors = {}
-
-    def get_data(self, url):
-        """Fetch and parse JSON from the given URL."""
-        json_text = requests.get(url, timeout=10).content
-        return json.loads(json_text)
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
@@ -62,12 +64,12 @@ class ColorfulcloudsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Test the API credentials.
         url = (
-            f"https://api.caiyunapp.com/{user_input['api_version']}/"
-            f"{user_input['api_key']}/{user_input['longitude']},"
+            f"https://api.caiyunapp.com/{user_input[CONF_API_VERSION]}/"
+            f"{user_input[CONF_API_KEY]}/{user_input['longitude']},"
             f"{user_input['latitude']}/daily.json"
         )
         try:
-            redata = await self.hass.async_add_executor_job(self.get_data, url)
+            redata = await self.hass.async_add_executor_job(_fetch_api_data, url)
         except (requests.exceptions.RequestException, json.JSONDecodeError) as error:
             _LOGGER.warning("Unable to connect to Colorfulclouds API: %s", error)
             self._errors["base"] = "cannot_connect"
@@ -89,7 +91,7 @@ class ColorfulcloudsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         api_version = "v2.5"
         data_schema = OrderedDict()
         data_schema[vol.Required(CONF_API_KEY)] = str
-        data_schema[vol.Optional("api_version", default=api_version)] = str
+        data_schema[vol.Optional(CONF_API_VERSION, default=api_version)] = str
         data_schema[
             vol.Optional(CONF_LONGITUDE, default=self.hass.config.longitude)
         ] = cv.longitude
@@ -113,19 +115,65 @@ class ColorfulcloudsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
     """Config flow options for Colorfulclouds."""
 
+    def __init__(self):
+        """Initialize."""
+        self._errors = {}
+
+    @property
+    def _api_key(self):
+        """Return the configured API key, options take precedence."""
+        return self.config_entry.options.get(
+            CONF_API_KEY
+        ) or self.config_entry.data.get(CONF_API_KEY, "")
+
+    @property
+    def _api_version(self):
+        """Return the configured API version, options take precedence."""
+        return self.config_entry.options.get(
+            CONF_API_VERSION
+        ) or self.config_entry.data.get(CONF_API_VERSION, "v2.5")
+
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        return await self.async_step_user()
+        return await self.async_step_user(user_input)
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
+        self._errors = {}
         if user_input is not None:
+            # Test the API credentials before saving.
+            api_key = user_input.get(CONF_API_KEY) or self._api_key
+            api_version = user_input.get(CONF_API_VERSION) or self._api_version
+            url = (
+                f"https://api.caiyunapp.com/{api_version}/{api_key}/"
+                f"{self.config_entry.data[CONF_LONGITUDE]},"
+                f"{self.config_entry.data[CONF_LATITUDE]}/daily.json"
+            )
+            try:
+                redata = await self.hass.async_add_executor_job(_fetch_api_data, url)
+            except (requests.exceptions.RequestException, json.JSONDecodeError) as error:
+                _LOGGER.warning("Unable to connect to Colorfulclouds API: %s", error)
+                self._errors["base"] = "cannot_connect"
+                return await self._show_options_form(user_input)
+
+            if redata.get("status") != "ok":
+                self._errors["base"] = "communication"
+                return await self._show_options_form(user_input)
+
             return self.async_create_entry(title="", data=user_input)
 
+        return await self._show_options_form(user_input)
+
+    async def _show_options_form(self, user_input):
+        """Show the options form."""
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
+                    vol.Optional(CONF_API_KEY, default=self._api_key): str,
+                    vol.Optional(
+                        CONF_API_VERSION, default=self._api_version
+                    ): str,
                     vol.Optional(
                         CONF_DAILYSTEPS,
                         default=self.config_entry.options.get(CONF_DAILYSTEPS, 5),
@@ -148,4 +196,5 @@ class ColorfulcloudsOptionsFlow(config_entries.OptionsFlow):
                     ): bool,
                 }
             ),
+            errors=self._errors,
         )

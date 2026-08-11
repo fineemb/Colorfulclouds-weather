@@ -27,6 +27,8 @@
         "title": "Colorful Clouds options",
         "description": "Set the number of days you need to get forecast data, as well as extreme weather warning data",
         "data": {
+          "api_key": "API Key",
+          "api_version": "API version, the default is v2.5",
           "dailysteps": "Day forecast (5-15)",
           "hourlysteps": "Hourly forecast (24-360)",
           "alert": "Extreme weather warnings",
@@ -34,6 +36,10 @@
           "interval": "Refresh interval in minutes"
         }
       }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the Colorfulclouds API.",
+      "communication": "The key may be invalid, please check the input value."
     }
   }
 }
