@@ -9,7 +9,7 @@
   "homekit": {},
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "2.2.0",
+  "version": "2.1.1",
   "ssdp": [],
   "zeroconf": []
 }
