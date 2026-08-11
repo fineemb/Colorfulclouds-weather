@@ -14,7 +14,7 @@ UNDO_UPDATE_LISTENER = "undo_update_listener"
 
 ATTRIBUTION = "Data provided by Colorfulclouds"
 ATTR_ICON = "icon"
-ATTR_FORECAST = CONF_DAILYSTEPS = "forecast"
+ATTR_FORECAST = "forecast"
 ATTR_LABEL = "label"
 ATTR_UNIT_IMPERIAL = "Imperial"
 ATTR_UNIT_METRIC = "Metric"

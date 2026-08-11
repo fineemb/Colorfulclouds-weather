@@ -1,4 +1,4 @@
-"""The colorfulClouds integration."""
+"""The Colorfulclouds integration."""
 
 import logging
 
@@ -12,6 +12,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
     CONF_ALERT,
@@ -24,24 +25,16 @@ from .const import (
     UNDO_UPDATE_LISTENER,
 )
 
-_LOGGER = logging.getLogger(__name__)
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
 from .colorfulclouds import ColorfulcloudsDataUpdateCoordinator
 
-# TODO List the platforms that you want to support.
-# For your initial PR, limit it to 1 platform.
+_LOGGER = logging.getLogger(__name__)
+
 PLATFORMS: list[Platform] = [Platform.WEATHER, Platform.SENSOR]
 
-# TODO Create ConfigEntry type alias with API object
-# TODO Rename type alias and update all entry annotations
-# type ColorfulClouds_ConfigEntry = ConfigEntry[MyApi]  # noqa: F821
 
-
-# TODO Update entry annotation
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    hass.data.setdefault(DOMAIN, {})
     """Set up Colorfulclouds as config entry."""
+    hass.data.setdefault(DOMAIN, {})
     api_key = config_entry.data[CONF_API_KEY]
     location_key = config_entry.unique_id
     longitude = config_entry.data[CONF_LONGITUDE]
@@ -52,7 +45,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     alert = config_entry.options.get(CONF_ALERT, True)
     starttime = config_entry.options.get(CONF_STARTTIME, 0)
     interval = config_entry.options.get(CONF_INTERVAL, 10)
-    # _LOGGER.debug("Using location_key: %s, get forecast: %s", location_key, api_version)
     websession = async_get_clientsession(hass)
     coordinator = ColorfulcloudsDataUpdateCoordinator(
         hass,
@@ -84,7 +76,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
-    hass.data[DOMAIN].pop(config_entry.entry_id)
+    if unload_ok:
+        entry_data = hass.data[DOMAIN].pop(config_entry.entry_id)
+        entry_data[UNDO_UPDATE_LISTENER]()
 
     return unload_ok
 

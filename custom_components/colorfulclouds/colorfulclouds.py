@@ -1,16 +1,18 @@
+"""Data update coordinator for the Colorfulclouds integration."""
+
+import asyncio
 import datetime
-import json
 import logging
 
-from aiohttp.client_exceptions import ClientConnectorError
+from aiohttp import ClientError
 from async_timeout import timeout
-import requests
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.unit_system import METRIC_SYSTEM
 
-_LOGGER = logging.getLogger(__name__)
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
@@ -42,50 +44,52 @@ class ColorfulcloudsDataUpdateCoordinator(DataUpdateCoordinator):
         self.api_version = api_version
         self.api_key = api_key
         self.starttime = starttime
-        self.is_metric = "metric:v2"
-        if hass.config.units is METRIC_SYSTEM:
-            self.is_metric = "metric:v2"
-        else:
-            self.is_metric = "imperial"
+        self.websession = websession
+        self.is_metric = "metric:v2" if hass.config.units is METRIC_SYSTEM else "imperial"
 
         update_interval = datetime.timedelta(minutes=self.interval)
-        _LOGGER.debug("Data will be update every %s", update_interval)
+        _LOGGER.debug("Data will be updated every %s", update_interval)
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)
 
-    # @asyncio.coroutine
-    def get_data(self, url):
-        json_text = requests.get(url).content
-        resdata = json.loads(json_text)
-        return resdata
+    def _build_url(self, start_timestamp: int) -> str:
+        """Build the Colorfulclouds API URL."""
+        return (
+            f"https://api.caiyunapp.com/{self.api_version}/{self.api_key}/"
+            f"{self.longitude},{self.latitude}/weather.json"
+            f"?dailysteps={self.dailysteps}&hourlysteps={self.hourlysteps}"
+            f"&alert={str(self.alert).lower()}&unit={self.is_metric}"
+            f"&timestamp={start_timestamp}"
+        )
 
     async def _async_update_data(self):
-        """Update data via library."""
+        """Update data via the Colorfulclouds API."""
+        start_timestamp = int(
+            (
+                datetime.datetime.now() + datetime.timedelta(days=self.starttime)
+            ).timestamp()
+        )
+        url = self._build_url(start_timestamp)
         try:
             async with timeout(10):
-                start_timestamp = int(
-                    (
-                        datetime.datetime.now()
-                        + datetime.timedelta(days=self.starttime)
-                    ).timestamp()
-                )
-                url = str.format(
-                    "https://api.caiyunapp.com/{}/{}/{},{}/weather.json?dailysteps={}&hourlysteps={}&alert={}&unit={}&timestamp={}",
-                    self.api_version,
-                    self.api_key,
-                    self.longitude,
-                    self.latitude,
-                    self.dailysteps,
-                    self.hourlysteps,
-                    str(self.alert).lower(),
-                    self.is_metric,
-                    start_timestamp,
-                )
-                # json_text = requests.get(url).content
-                resdata = await self.hass.async_add_executor_job(self.get_data, url)
-        except ClientConnectorError as error:
-            raise UpdateFailed(error)
-        _LOGGER.debug("Requests remaining: %s", url)
+                resp = await self.websession.get(url)
+                resdata = await resp.json()
+        except (ClientError, asyncio.TimeoutError) as error:
+            raise UpdateFailed(
+                f"Error communicating with Colorfulclouds API: {error}"
+            ) from error
+        except ValueError as error:
+            raise UpdateFailed(
+                f"Invalid response from Colorfulclouds API: {error}"
+            ) from error
+
+        if resdata.get("status") != "ok":
+            raise UpdateFailed(
+                "Colorfulclouds API returned an error: "
+                f"{resdata.get('error') or resdata.get('status')}"
+            )
+
+        _LOGGER.debug("Colorfulclouds data refreshed successfully")
         return {
             **resdata,
             "location_key": self.location_key,

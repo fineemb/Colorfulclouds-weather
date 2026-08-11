@@ -15,6 +15,7 @@
             }
         },
         "error": {
+            "cannot_connect": "无法连接到彩云天气 API。",
             "communication": "Key可能无效，请检查输入值."
         },
         "abort": {
@@ -24,7 +25,8 @@
     },
     "options": {
         "step": {
-            "user":{
+            "user": {
+                "title": "彩云天气选项",
                 "data": {
                     "dailysteps": "天级预报(5-15)",
                     "hourlysteps": "小时级预报(24-360)",

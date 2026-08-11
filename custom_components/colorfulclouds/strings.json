@@ -2,20 +2,38 @@
   "config": {
     "step": {
       "user": {
+        "title": "Colorful Clouds",
+        "description": "If you need help with configuration, check here: https://github.com/fineemb/Colorfulclouds-weather",
         "data": {
-          "host": "[%key:common::config_flow::data::host%]",
-          "username": "[%key:common::config_flow::data::username%]",
-          "password": "[%key:common::config_flow::data::password%]"
+          "api_key": "API Key",
+          "api_version": "API version, the default is v2.5",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "name": "Name"
         }
       }
     },
     "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "cannot_connect": "Cannot connect to the Colorfulclouds API.",
+      "communication": "The key may be invalid, please check the input value."
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "This location is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Colorful Clouds options",
+        "description": "Set the number of days you need to get forecast data, as well as extreme weather warning data",
+        "data": {
+          "dailysteps": "Day forecast (5-15)",
+          "hourlysteps": "Hourly forecast (24-360)",
+          "alert": "Extreme weather warnings",
+          "starttime": "The forecast start time, -1 is yesterday, -2 is the day before yesterday",
+          "interval": "Refresh interval in minutes"
+        }
+      }
     }
   }
 }

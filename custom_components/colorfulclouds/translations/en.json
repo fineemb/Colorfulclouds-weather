@@ -15,6 +15,7 @@
             }
         },
         "error": {
+            "cannot_connect": "Cannot connect to the Colorfulclouds API.",
             "communication": "The key may be invalid, please check the input value."
         },
         "abort": {
@@ -24,12 +25,14 @@
     },
     "options": {
         "step": {
-            "user":{
+            "user": {
+                "title": "Colorful Clouds options",
                 "data": {
                     "dailysteps": "Day Forecast (5-15)",
                     "hourlysteps": "Hourly forecast (24-360)",
                     "alert": "Extreme weather warnings",
-                    "starttime": "The forecast start time, -1 is yesterday, -2 is the day before yesterday"
+                    "starttime": "The forecast start time, -1 is yesterday, -2 is the day before yesterday",
+                    "interval": "Refresh interval in minutes"
                 },
                 "description": "Set the number of days you need to get forecast data, as well as extreme weather warning data"
             }

@@ -86,36 +86,33 @@ class ColorfulcloudsSensor(Entity):
     @property
     def state(self):
         """Return the state."""
-        if self.kind == "apparent_temperature":
-            return self.coordinator.data["result"]["realtime"][self.kind]
-        if self.kind == "pressure":
-            return self.coordinator.data["result"]["realtime"][self.kind]
-        if self.kind == "temperature":
-            return self.coordinator.data["result"]["realtime"][self.kind]
-        if self.kind == "humidity":
-            return round(
-                float(self.coordinator.data["result"]["realtime"][self.kind]) * 100
-            )
-        if self.kind == "cloudrate":
-            return self.coordinator.data["result"]["realtime"][self.kind]
-        if self.kind == "visibility":
-            return self.coordinator.data["result"]["realtime"][self.kind]
-        if self.kind == "WindSpeed":
-            return self.coordinator.data["result"]["realtime"]["wind"]["speed"]
-        if self.kind == "WindDirection":
-            return self.coordinator.data["result"]["realtime"]["wind"]["direction"]
-        if self.kind == "comfort":
-            return self.coordinator.data["result"]["realtime"]["life_index"]["comfort"][
-                "index"
-            ]
-        if self.kind == "ultraviolet":
-            return self.coordinator.data["result"]["realtime"]["life_index"][
-                "ultraviolet"
-            ]["index"]
-        if self.kind == "precipitation":
-            return self.coordinator.data["result"]["realtime"]["precipitation"][
-                "local"
-            ]["intensity"]
+        try:
+            realtime = self.coordinator.data["result"]["realtime"]
+            if self.kind == "apparent_temperature":
+                return realtime[self.kind]
+            if self.kind == "pressure":
+                return realtime[self.kind]
+            if self.kind == "temperature":
+                return realtime[self.kind]
+            if self.kind == "humidity":
+                return round(float(realtime[self.kind]) * 100)
+            if self.kind == "cloudrate":
+                return round(float(realtime[self.kind]) * 100)
+            if self.kind == "visibility":
+                return realtime[self.kind]
+            if self.kind == "WindSpeed":
+                return realtime["wind"]["speed"]
+            if self.kind == "WindDirection":
+                return realtime["wind"]["direction"]
+            if self.kind == "comfort":
+                return realtime["life_index"]["comfort"]["index"]
+            if self.kind == "ultraviolet":
+                return realtime["life_index"]["ultraviolet"]["index"]
+            if self.kind == "precipitation":
+                return realtime["precipitation"]["local"]["intensity"]
+        except (KeyError, TypeError):
+            return None
+        return None
 
     @property
     def icon(self):
@@ -141,24 +138,28 @@ class ColorfulcloudsSensor(Entity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes."""
+        realtime = self.coordinator.data["result"]["realtime"]
         if self.kind == "ultraviolet":
-            self._attrs["desc"] = self.coordinator.data["result"]["realtime"][
-                "life_index"
-            ]["ultraviolet"]["desc"]
+            self._attrs["desc"] = (
+                realtime.get("life_index", {})
+                .get("ultraviolet", {})
+                .get("desc", "")
+            )
         elif self.kind == "comfort":
-            self._attrs["desc"] = self.coordinator.data["result"]["realtime"][
-                "life_index"
-            ]["comfort"]["desc"]
+            self._attrs["desc"] = (
+                realtime.get("life_index", {}).get("comfort", {}).get("desc", "")
+            )
         elif self.kind == "precipitation":
-            self._attrs["datasource"] = self.coordinator.data["result"]["realtime"][
-                "precipitation"
-            ]["local"]["datasource"]
-            self._attrs["nearest_intensity"] = self.coordinator.data["result"][
-                "realtime"
-            ]["precipitation"]["nearest"]["intensity"]
-            self._attrs["nearest_distance"] = self.coordinator.data["result"][
-                "realtime"
-            ]["precipitation"]["nearest"]["distance"]
+            precipitation = realtime.get("precipitation", {})
+            self._attrs["datasource"] = (
+                precipitation.get("local", {}).get("datasource", "")
+            )
+            self._attrs["nearest_intensity"] = (
+                precipitation.get("nearest", {}).get("intensity", "")
+            )
+            self._attrs["nearest_distance"] = (
+                precipitation.get("nearest", {}).get("distance", "")
+            )
         return self._attrs
 
     @property
